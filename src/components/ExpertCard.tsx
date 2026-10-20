@@ -46,6 +46,8 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
     }
   };
 
+  const webpImage = image.replace(/\.png$/i, '.webp');
+
   return (
     <div
       ref={cardRef}
@@ -58,14 +60,17 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
         <div className="pcard__glare" aria-hidden="true" />
         <div className="pcard__rim" aria-hidden="true" />
         <div className="pcard__avatar">
-          <img
-            src={image}
-            alt={`${name} - ${role} at Social Auctus`}
-            width={310}
-            height={310}
-            loading="lazy"
-            decoding="async"
-          />
+          <picture>
+            <source srcSet={webpImage} type="image/webp" />
+            <img
+              src={image}
+              alt={`${name} - ${role} at Social Auctus`}
+              width={310}
+              height={310}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
         </div>
         <div className="pcard__text">
           <h3 className="pcard__name">{name}</h3>

@@ -49,6 +49,19 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
 
+    <!-- Critical Path Inline CSS for Near-Zero FCP -->
+    <style>
+      html, body {
+        background-color: #191919;
+        color: #ffffff;
+        margin: 0;
+        font-family: 'Raleway', system-ui, -apple-system, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+
     <!-- Fonts Preconnect & Optimized Non-Render-Blocking Asynchronous Loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

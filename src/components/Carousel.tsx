@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { GoldButton } from './GoldButton';
 
 interface CarouselProps {
@@ -11,6 +11,8 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
   const containerRef = useRef<HTMLUListElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [maxIdx, setMaxIdx] = useState(slides.length);
+  const rawId = useId();
+  const idPrefix = `carousel-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${rawId.replace(/:/g, '')}`;
 
   const calculatePagination = useCallback(() => {
     const list = containerRef.current;
@@ -62,10 +64,18 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
           if (e.key === 'ArrowRight') scrollToSlide(activeIdx + 1);
           if (e.key === 'ArrowLeft') scrollToSlide(activeIdx - 1);
         }}
-        aria-live="polite"
+        aria-label={label}
       >
         {slides.map((slide, idx) => (
-          <li key={idx} className="scarousel__slide">
+          <li
+            key={idx}
+            id={`${idPrefix}-slide-${idx}`}
+            role="tabpanel"
+            aria-roledescription="slide"
+            aria-label={`Slide ${idx + 1} of ${slides.length}`}
+            aria-labelledby={`${idPrefix}-tab-${Math.min(idx, maxIdx - 1)}`}
+            className="scarousel__slide"
+          >
             {slide}
           </li>
         ))}
@@ -90,16 +100,33 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
           </svg>
         </GoldButton>
 
-        <div className="flex items-center gap-1" role="tablist" aria-label={`${label} pagination`}>
+        <div
+          className="flex items-center gap-1"
+          role="tablist"
+          aria-label={`${label} pagination`}
+        >
           {Array.from({ length: maxIdx }, (_, idx) => (
             <button
               key={idx}
+              id={`${idPrefix}-tab-${idx}`}
               type="button"
+              role="tab"
+              aria-selected={idx === activeIdx}
+              aria-controls={`${idPrefix}-slide-${idx}`}
+              tabIndex={idx === activeIdx ? 0 : -1}
               className="scarousel__dot"
               data-active={idx === activeIdx}
               onClick={() => scrollToSlide(idx)}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  scrollToSlide(Math.min(maxIdx - 1, idx + 1));
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  scrollToSlide(Math.max(0, idx - 1));
+                }
+              }}
               aria-label={`Go to slide ${idx + 1}`}
-              aria-current={idx === activeIdx}
             >
               <span className="scarousel__dot__pill" aria-hidden="true" />
             </button>
