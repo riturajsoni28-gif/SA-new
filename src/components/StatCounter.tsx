@@ -67,8 +67,8 @@ export const StatCounter: React.FC<StatCounterProps> = ({
     : Math.round(val);
 
   return (
-    <span ref={ref} className={className} aria-label={`${formatNumber(to, decimals)}${suffix}`}>
-      <span aria-hidden="true" className="tabular-nums">
+    <span ref={ref} className={className}>
+      <span className="tabular-nums">
         {formatNumber(rounded, decimals)}
         {suffix}
       </span>

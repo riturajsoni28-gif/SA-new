@@ -60,8 +60,8 @@ const SERVICES: ServiceItem[] = [
 ];
 
 const EXPERTS = [
-  { name: 'Ashish Makineni', role: 'Co-founder & CEO', image: '/images/ashish.png' },
-  { name: 'Rituraj Soni', role: 'Co-founder & CFO', image: '/images/rituraj.png' },
+  { name: 'Ashish Makineni', role: 'CO-FOUNDER & CEO', image: '/images/ashish.png' },
+  { name: 'Rituraj Soni', role: 'CO-FOUNDER & CFO', image: '/images/rituraj.png' },
 ];
 
 const REASONS = [
@@ -509,7 +509,7 @@ export default function App() {
             </a>
             <div className="max-w-[652px]">
               <p className="text-[20px] font-medium text-[#ffd04f]">Where Strategy Meets Growth</p>
-              <p className="mt-4 text-[16px] text-[#bfbfbf] leading-relaxed">
+              <p className="mt-4 text-[16px] text-[#d1d5db] leading-relaxed">
                 Transform your digital presence with data-driven marketing strategies from former Google
                 Ads experts. We help businesses grow smarter and faster.
               </p>
@@ -523,8 +523,8 @@ export default function App() {
 
           {/* Services Column */}
           <div>
-            <p className="text-[20px] font-medium text-[#f2f2f2]">Services</p>
-            <ul className="mt-4 flex flex-col gap-2.5 text-[16px] text-[#a0a0a0]">
+            <p className="text-[20px] font-semibold text-white">Services</p>
+            <ul className="mt-4 flex flex-col gap-2.5 text-[16px] text-[#d1d5db]">
               {FOOTER_SERVICES.map((s) => (
                 <li key={s} className="hover:text-white transition-colors cursor-pointer">
                   {s}
@@ -535,8 +535,8 @@ export default function App() {
 
           {/* Contact Column */}
           <div>
-            <p className="text-[20px] font-medium text-[#f2f2f2]">Contact</p>
-            <ul className="mt-4 flex flex-col gap-2.5 text-[16px] text-[#a0a0a0]">
+            <p className="text-[20px] font-semibold text-white">Contact</p>
+            <ul className="mt-4 flex flex-col gap-2.5 text-[16px] text-[#d1d5db]">
               <li>
                 <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-[#ffd04f] transition-colors">
                   {CONTACT_EMAIL}
@@ -565,8 +565,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* Copyright notice */}
-        <div className="border-t border-[#262626] py-6 text-center text-xs text-[#737373]">
+        {/* Copyright notice with WCAG AA compliant text color */}
+        <div className="border-t border-[#262626] py-6 text-center text-xs text-[#9ca3af]">
           <p>© {new Date().getFullYear()} Social Auctus. All rights reserved.</p>
         </div>
       </footer>

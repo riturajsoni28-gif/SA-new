@@ -64,6 +64,7 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
             width={310}
             height={310}
             loading="lazy"
+            decoding="async"
           />
         </div>
         <div className="pcard__text">

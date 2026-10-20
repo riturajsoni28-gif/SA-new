@@ -21,7 +21,9 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
     const visibleCount = Math.max(1, Math.round(list.clientWidth / childWidth));
     const totalSlides = Math.max(1, slides.length - visibleCount + 1);
     setMaxIdx(totalSlides);
-    setActiveIdx(Math.max(0, Math.min(Math.round(list.scrollLeft / childWidth), slides.length - visibleCount)));
+    setActiveIdx(
+      Math.max(0, Math.min(Math.round(list.scrollLeft / childWidth), slides.length - visibleCount))
+    );
   }, [slides.length]);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
         ))}
       </ul>
 
-      <div className="mt-4 flex items-center justify-center gap-5">
+      <div className="mt-4 flex items-center justify-center gap-4">
         <GoldButton
           type="button"
           className="scarousel__arrow"
@@ -88,7 +90,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
           </svg>
         </GoldButton>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1" role="tablist" aria-label={`${label} pagination`}>
           {Array.from({ length: maxIdx }, (_, idx) => (
             <button
               key={idx}
@@ -98,7 +100,9 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
               onClick={() => scrollToSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
               aria-current={idx === activeIdx}
-            />
+            >
+              <span className="scarousel__dot__pill" aria-hidden="true" />
+            </button>
           ))}
         </div>
 
