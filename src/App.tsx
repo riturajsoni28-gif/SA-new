@@ -10,15 +10,24 @@ import { StatCounter } from './components/StatCounter';
 import { ServiceCard, ServiceItem } from './components/ServiceCard';
 import { ExpertCard } from './components/ExpertCard';
 import { Carousel } from './components/Carousel';
-
 const AboutCanvas = React.lazy(() =>
   import('./components/AboutCanvas').then((m) => ({ default: m.AboutCanvas }))
+);
+
+const RoasCalculator = React.lazy(() =>
+  import('./components/RoasCalculator').then((m) => ({ default: m.RoasCalculator }))
+);
+
+const WebsiteAudit = React.lazy(() =>
+  import('./components/WebsiteAudit').then((m) => ({ default: m.WebsiteAudit }))
 );
 
 // Data definitions matching socialauctus.com
 const NAV_LINKS = [
   { label: 'Why us', href: '#why-us' },
   { label: 'Services', href: '#services' },
+  { label: 'ROAS Calculator', href: '#roas-calculator' },
+  { label: 'Free Audit', href: '#free-audit' },
   { label: 'About us', href: '#about-us' },
 ];
 
@@ -307,6 +316,20 @@ export default function App() {
           </dl>
         </section>
 
+        {/* ROAS Calculator Section */}
+        <section id="roas-calculator" className="mx-auto mt-12 w-full max-w-[1621px] px-4 md:mt-[70px] md:px-[54px]">
+          <React.Suspense fallback={<div className="min-h-[380px] rounded-[36px] bg-[#121213] border border-[#2e2e2e]" />}>
+            <RoasCalculator />
+          </React.Suspense>
+        </section>
+
+        {/* Free Website Audit & PageSpeed Checker Section */}
+        <section id="free-audit" className="mx-auto mt-12 w-full max-w-[1621px] px-4 md:mt-[70px] md:px-[54px]">
+          <React.Suspense fallback={<div className="min-h-[380px] rounded-[36px] bg-[#121213] border border-[#2e2e2e]" />}>
+            <WebsiteAudit />
+          </React.Suspense>
+        </section>
+
         {/* About Section */}
         <section id="about-us" className="mx-auto mt-12 w-full max-w-[1621px] px-4 md:mt-[100px] md:px-[54px]">
           <div className="relative isolate flex flex-col items-center gap-8 overflow-hidden rounded-[36px] bg-black px-6 py-14 text-center text-white md:px-[54px] md:py-[82px] border border-[#2b2b2b]">
@@ -371,7 +394,6 @@ export default function App() {
                 name={expert.name}
                 role={expert.role}
                 image={expert.image}
-                ctaHref="#contact"
               />
             ))}
           </div>

@@ -437,3 +437,40 @@
   line-height: 1.4;
   transform: translateZ(16px);
 }
+
+/* Range slider custom styling for ROAS Calculator */
+input[type="range"].roas-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  outline: none;
+}
+
+input[type="range"].roas-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe08a 0%, #ffd04f 52%, #f4bd2f 100%);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 208, 79, 0.7);
+  border: 2px solid #000;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].roas-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"].roas-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe08a 0%, #ffd04f 52%, #f4bd2f 100%);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 208, 79, 0.7);
+  border: 2px solid #000;
+  transition: transform 0.15s ease;
+}

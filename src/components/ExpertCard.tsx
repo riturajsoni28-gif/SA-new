@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { GoldButton } from './GoldButton';
 
 const canHover = () =>
   typeof window !== 'undefined' &&
@@ -9,16 +8,12 @@ interface ExpertCardProps {
   name: string;
   role: string;
   image: string;
-  ctaLabel?: string;
-  ctaHref?: string;
 }
 
 export const ExpertCard: React.FC<ExpertCardProps> = ({
   name,
   role,
   image,
-  ctaLabel = 'Get in touch',
-  ctaHref = '#contact',
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const MAX_TILT = 9;
@@ -76,9 +71,6 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({
           <h3 className="pcard__name">{name}</h3>
           <p className="pcard__role">{role}</p>
         </div>
-        <GoldButton className="pcard__cta" href={ctaHref}>
-          {ctaLabel}
-        </GoldButton>
       </article>
     </div>
   );
