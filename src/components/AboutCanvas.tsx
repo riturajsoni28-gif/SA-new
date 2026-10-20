@@ -99,119 +99,145 @@ export const AboutCanvas: React.FC<AboutCanvasProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('aria-hidden', 'true');
-    canvas.style.cssText = 'display:block;width:100%;height:100%;position:absolute;inset:0;';
+    let cleanupFn: (() => void) | undefined;
+    let isInitialized = false;
 
-    const gl = canvas.getContext('webgl2', { antialias: false });
-    if (!gl) return;
-    container.appendChild(canvas);
+    const setupWebGL = () => {
+      if (isInitialized) return;
+      isInitialized = true;
 
-    const vert = createShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
-    const frag = createShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
-    if (!vert || !frag) return;
+      const canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-hidden', 'true');
+      canvas.style.cssText = 'display:block;width:100%;height:100%;position:absolute;inset:0;';
 
-    const program = gl.createProgram();
-    if (!program) return;
-    gl.attachShader(program, vert);
-    gl.attachShader(program, frag);
-    gl.linkProgram(program);
-    gl.useProgram(program);
+      const gl = canvas.getContext('webgl2', { antialias: false });
+      if (!gl) return;
+      container.appendChild(canvas);
 
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW
+      const vert = createShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
+      const frag = createShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+      if (!vert || !frag) return;
+
+      const program = gl.createProgram();
+      if (!program) return;
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+      gl.useProgram(program);
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW
+      );
+
+      const aPos = gl.getAttribLocation(program, 'aPos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      const getLoc = (name: string) => gl.getUniformLocation(program, name);
+      const uRes = getLoc('uRes');
+      const uTime = getLoc('uTime');
+      const uMouse = getLoc('uMouse');
+
+      gl.uniform3fv(getLoc('uDeep'), hexToRgb(deepColor));
+      gl.uniform3fv(getLoc('uCrest'), hexToRgb(crestColor));
+      gl.uniform1f(getLoc('uAmp'), amplitude);
+      gl.uniform1f(getLoc('uLayers'), Math.min(10, Math.max(1, layers)));
+      gl.uniform1f(getLoc('uGlow'), glow);
+
+      const mouse = { x: 0.5, tx: 0.5 };
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const startTime = performance.now();
+      let animId = 0;
+      let isVisible = true;
+
+      const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = Math.max(1, Math.floor(container.clientWidth * dpr));
+        const h = Math.max(1, Math.floor(container.clientHeight * dpr));
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+        gl.uniform2f(uRes, w, h);
+        render(performance.now());
+      };
+
+      const render = (now: number) => {
+        mouse.x += (mouse.tx - mouse.x) * 0.05;
+        gl.uniform1f(uTime, prefersReducedMotion ? 4 : ((now - startTime) / 1000) * speed);
+        gl.uniform2f(uMouse, mouse.x, 0.5);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+
+      const loop = (now: number) => {
+        render(now);
+        animId = requestAnimationFrame(loop);
+      };
+
+      const start = () => {
+        if (!animId && isVisible && !document.hidden && !prefersReducedMotion) {
+          animId = requestAnimationFrame(loop);
+        }
+      };
+
+      const stop = () => {
+        cancelAnimationFrame(animId);
+        animId = 0;
+      };
+
+      const onPointerMove = (e: PointerEvent) => {
+        const rect = container.getBoundingClientRect();
+        mouse.tx = 0.5 + ((e.clientX - rect.left) / rect.width - 0.5) * parallax;
+      };
+
+      const onVisibilityChange = () => (document.hidden ? stop() : start());
+
+      const ro = new ResizeObserver(resize);
+      ro.observe(container);
+
+      const io = new IntersectionObserver(([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) start();
+        else stop();
+      });
+      io.observe(container);
+
+      if (parallax) window.addEventListener('pointermove', onPointerMove, { passive: true });
+      document.addEventListener('visibilitychange', onVisibilityChange);
+
+      resize();
+      start();
+
+      cleanupFn = () => {
+        stop();
+        ro.disconnect();
+        io.disconnect();
+        window.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
+        canvas.remove();
+      };
+    };
+
+    // Defer initialization until About section is near viewport
+    const viewportObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setupWebGL();
+          viewportObserver.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
     );
 
-    const aPos = gl.getAttribLocation(program, 'aPos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-    const getLoc = (name: string) => gl.getUniformLocation(program, name);
-    const uRes = getLoc('uRes');
-    const uTime = getLoc('uTime');
-    const uMouse = getLoc('uMouse');
-
-    gl.uniform3fv(getLoc('uDeep'), hexToRgb(deepColor));
-    gl.uniform3fv(getLoc('uCrest'), hexToRgb(crestColor));
-    gl.uniform1f(getLoc('uAmp'), amplitude);
-    gl.uniform1f(getLoc('uLayers'), Math.min(10, Math.max(1, layers)));
-    gl.uniform1f(getLoc('uGlow'), glow);
-
-    const mouse = { x: 0.5, tx: 0.5 };
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const startTime = performance.now();
-    let animId = 0;
-    let isVisible = true;
-
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.max(1, Math.floor(container.clientWidth * dpr));
-      const h = Math.max(1, Math.floor(container.clientHeight * dpr));
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-      gl.uniform2f(uRes, w, h);
-      render(performance.now());
-    };
-
-    const render = (now: number) => {
-      mouse.x += (mouse.tx - mouse.x) * 0.05;
-      gl.uniform1f(uTime, prefersReducedMotion ? 4 : ((now - startTime) / 1000) * speed);
-      gl.uniform2f(uMouse, mouse.x, 0.5);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-
-    const loop = (now: number) => {
-      render(now);
-      animId = requestAnimationFrame(loop);
-    };
-
-    const start = () => {
-      if (!animId && isVisible && !document.hidden && !prefersReducedMotion) {
-        animId = requestAnimationFrame(loop);
-      }
-    };
-
-    const stop = () => {
-      cancelAnimationFrame(animId);
-      animId = 0;
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
-      mouse.tx = 0.5 + ((e.clientX - rect.left) / rect.width - 0.5) * parallax;
-    };
-
-    const onVisibilityChange = () => (document.hidden ? stop() : start());
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(container);
-
-    const io = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-      if (isVisible) start();
-      else stop();
-    });
-    io.observe(container);
-
-    if (parallax) window.addEventListener('pointermove', onPointerMove, { passive: true });
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    resize();
-    start();
+    viewportObserver.observe(container);
 
     return () => {
-      stop();
-      ro.disconnect();
-      io.disconnect();
-      window.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-      canvas.remove();
+      viewportObserver.disconnect();
+      cleanupFn?.();
     };
   }, [deepColor, crestColor, speed, amplitude, layers, glow, parallax]);
 

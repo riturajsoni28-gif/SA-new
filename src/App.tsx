@@ -5,12 +5,15 @@
 
 import React, { useState } from 'react';
 import { HeroCanvas } from './components/HeroCanvas';
-import { AboutCanvas } from './components/AboutCanvas';
 import { GoldButton } from './components/GoldButton';
 import { StatCounter } from './components/StatCounter';
 import { ServiceCard, ServiceItem } from './components/ServiceCard';
 import { ExpertCard } from './components/ExpertCard';
 import { Carousel } from './components/Carousel';
+
+const AboutCanvas = React.lazy(() =>
+  import('./components/AboutCanvas').then((m) => ({ default: m.AboutCanvas }))
+);
 
 // Data definitions matching socialauctus.com
 const NAV_LINKS = [
@@ -307,10 +310,12 @@ export default function App() {
         {/* About Section */}
         <section id="about-us" className="mx-auto mt-12 w-full max-w-[1621px] px-4 md:mt-[100px] md:px-[54px]">
           <div className="relative isolate flex flex-col items-center gap-8 overflow-hidden rounded-[36px] bg-black px-6 py-14 text-center text-white md:px-[54px] md:py-[82px] border border-[#2b2b2b]">
-            <AboutCanvas className="pointer-events-none absolute inset-0 -z-10" />
+            <React.Suspense fallback={<div className="pointer-events-none absolute inset-0 -z-10 bg-black" />}>
+              <AboutCanvas className="pointer-events-none absolute inset-0 -z-10" />
+            </React.Suspense>
             <h2 className="sr-only">About Social Auctus - High-Converting Performance Marketing</h2>
             <p className="text-[clamp(20px,1.72vw,28px)] font-semibold [text-shadow:0_2px_14px_rgb(0_0_0/0.8)] text-[#ffd04f]">
-              At Auctus,
+              At Social Auctus,
             </p>
             <p className="text-[clamp(22px,2.1vw,34px)] font-light leading-tight [text-shadow:0_2px_14px_rgb(0_0_0/0.8)]">
               we turn ad budgets into measurable business growth.

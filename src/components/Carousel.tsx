@@ -8,7 +8,7 @@ interface CarouselProps {
 }
 
 export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '' }) => {
-  const containerRef = useRef<HTMLUListElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [maxIdx, setMaxIdx] = useState(slides.length);
   const rawId = useId();
@@ -55,7 +55,8 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
       aria-roledescription="carousel"
       aria-label={label}
     >
-      <ul
+      {/* Semantic div container replacing ul to eliminate ARIA list structure mismatch */}
+      <div
         ref={containerRef}
         className="scarousel"
         tabIndex={0}
@@ -67,7 +68,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
         aria-label={label}
       >
         {slides.map((slide, idx) => (
-          <li
+          <div
             key={idx}
             id={`${idPrefix}-slide-${idx}`}
             role="tabpanel"
@@ -77,9 +78,9 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, label, className = '
             className="scarousel__slide"
           >
             {slide}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
       <div className="mt-4 flex items-center justify-center gap-4">
         <GoldButton
