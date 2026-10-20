@@ -377,7 +377,7 @@ export const RoasCalculator: React.FC = () => {
           <div className="flex flex-col justify-between rounded-2xl border border-[#333] bg-[#202022] p-5 transition-colors hover:border-[#ffd04f]/40">
             <div className="flex items-center justify-between">
               <label htmlFor="cr-input" className="text-sm font-semibold text-[#e5e7eb]">
-                Conversion Rate
+                Expected Conversion Rate
               </label>
               <span className="rounded bg-[#ffd04f]/15 px-2 py-0.5 text-xs font-bold text-[#ffd04f]">
                 % RATE
